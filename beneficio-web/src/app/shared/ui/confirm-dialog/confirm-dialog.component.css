@@ -1,0 +1,28 @@
+.confirm-message {
+  align-items: flex-start;
+  background: #f7f9fc;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+}
+
+.confirm-message mat-icon {
+  color: #31546f;
+}
+
+.confirm-message.danger {
+  background: #fff7f6;
+  border-color: #f4c7c2;
+}
+
+.confirm-message.danger mat-icon {
+  color: #b42318;
+}
+
+p {
+  color: #334155;
+  line-height: 1.45;
+  margin: 0;
+}

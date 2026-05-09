@@ -1,0 +1,64 @@
+<h2 mat-dialog-title>Transferir saldo</h2>
+
+<mat-dialog-content>
+  <form class="form" [formGroup]="form">
+    <div class="account-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Origem</mat-label>
+        <mat-select formControlName="origemId">
+          @for (beneficio of data.beneficios; track beneficio.id) {
+            <mat-option [value]="beneficio.id">{{ beneficio.nome }} - {{ formatarCentavos(beneficio.valorCentavos) | currency:'BRL' }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Destino</mat-label>
+        <mat-select formControlName="destinoId">
+          @for (beneficio of data.beneficios; track beneficio.id) {
+            <mat-option [value]="beneficio.id">{{ beneficio.nome }} - {{ formatarCentavos(beneficio.valorCentavos) | currency:'BRL' }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>Valor</mat-label>
+      <span matTextPrefix>R$&nbsp;</span>
+      <input matInput type="text" inputmode="decimal" formControlName="valorReais" placeholder="0,00" appCurrencyMask>
+      <mat-error>Informe um valor maior que zero.</mat-error>
+    </mat-form-field>
+
+    <section class="summary">
+      <header>
+        <mat-icon>receipt_long</mat-icon>
+        <strong>Resumo da operacao</strong>
+      </header>
+      <div>
+        <span>Origem</span>
+        <strong>{{ origem?.nome || '-' }}</strong>
+        <small>{{ formatarCentavos(origem?.valorCentavos) | currency:'BRL' }} <mat-icon>arrow_forward</mat-icon> {{ formatarCentavos(saldoOrigemPrevisto) | currency:'BRL' }}</small>
+      </div>
+      <div>
+        <span>Destino</span>
+        <strong>{{ destino?.nome || '-' }}</strong>
+        <small>{{ formatarCentavos(destino?.valorCentavos) | currency:'BRL' }} <mat-icon>arrow_forward</mat-icon> {{ formatarCentavos(saldoDestinoPrevisto) | currency:'BRL' }}</small>
+      </div>
+    </section>
+
+    @if (form.value.origemId === form.value.destinoId) {
+      <p class="error">Origem e destino devem ser diferentes.</p>
+    }
+    @if (saldoOrigemPrevisto < 0) {
+      <p class="error">Saldo previsto da origem ficara negativo.</p>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="transferir()" [disabled]="saldoOrigemPrevisto < 0">
+    <mat-icon>sync_alt</mat-icon>
+    Confirmar transferencia
+  </button>
+</mat-dialog-actions>

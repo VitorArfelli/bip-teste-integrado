@@ -1,0 +1,29 @@
+html, body {
+  height: 100%;
+}
+
+:root {
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-sidebar: #132238;
+  --color-border: #dce3eb;
+  --color-heading: #182230;
+  --color-muted: #667085;
+  --color-success: #087443;
+  --color-danger: #b42318;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: #1f2933;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.mat-mdc-dialog-content {
+  box-sizing: border-box;
+  max-width: 100%;
+}

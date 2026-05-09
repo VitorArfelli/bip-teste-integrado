@@ -1,0 +1,11 @@
+.form {
+  display: grid;
+  gap: 14px;
+  padding-top: 6px;
+}
+
+:host ::ng-deep .mat-mdc-dialog-title {
+  color: var(--color-heading);
+  font-size: 20px;
+  font-weight: 700;
+}

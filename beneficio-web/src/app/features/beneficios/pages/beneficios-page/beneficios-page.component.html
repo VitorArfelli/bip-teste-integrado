@@ -1,0 +1,180 @@
+<main class="workspace">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">B</span>
+      <div>
+        <strong>BenefitOps</strong>
+        <small>Transfer Console</small>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Navegacao principal">
+      <a class="active"><mat-icon>dashboard</mat-icon> Operacao</a>
+    </nav>
+  </aside>
+
+  <section class="content">
+    <header class="toolbar">
+      <div>
+        <span class="eyebrow">Plataforma corporativa de beneficios</span>
+        <h1>Gestao de saldos e transferencias</h1>
+      </div>
+      <div class="actions">
+        <button mat-stroked-button color="primary" (click)="carregar()" [disabled]="loading || mutating" matTooltip="Atualizar dados">
+          <mat-icon>refresh</mat-icon>
+          Atualizar
+        </button>
+        <button mat-stroked-button color="primary" (click)="abrirTransferencia()" [disabled]="beneficiosAtivos < 2 || mutating">
+          <mat-icon>sync_alt</mat-icon>
+          Transferir
+        </button>
+        <button mat-flat-button color="primary" (click)="novo()" [disabled]="mutating">
+          <mat-icon>add</mat-icon>
+          Novo beneficio
+        </button>
+      </div>
+    </header>
+
+    @if (loading) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <section class="metrics" aria-label="Indicadores operacionais">
+      <article>
+        <span>Total de beneficios</span>
+        <strong>{{ beneficios.length }}</strong>
+      </article>
+      <article class="metric-money">
+        <span>Saldo total</span>
+        <strong>{{ saldoTotal | currency:'BRL' }}</strong>
+      </article>
+      <article>
+        <span>Beneficios ativos</span>
+        <strong>{{ beneficiosAtivos }}</strong>
+      </article>
+      <article>
+        <span>Transferencias no mes</span>
+        <strong>{{ transferenciasMes }}</strong>
+      </article>
+      <article>
+        <span>Integracao EJB</span>
+        <strong class="health" [class.offline]="ejbStatus !== 'EJB OK'">{{ ejbStatus }}</strong>
+      </article>
+    </section>
+
+    <section class="operation">
+      <div class="section-header">
+        <div>
+          <h2>Beneficios</h2>
+          <p>Controle operacional com status, saldo e versao transacional.</p>
+        </div>
+        @if (ultimaTransferencia) {
+          <div class="last-transfer">
+            <span>Ultima transferencia</span>
+            <strong>
+              {{ nomeBeneficio(ultimaTransferencia.origemId) }} para {{ nomeBeneficio(ultimaTransferencia.destinoId) }}
+            </strong>
+            <small>{{ formatarCentavos(ultimaTransferencia.valorCentavos) | currency:'BRL' }} em {{ ultimaTransferencia.criadaEm | date:'dd/MM HH:mm' }}</small>
+          </div>
+        }
+      </div>
+
+      <div class="filters">
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar por nome</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [(ngModel)]="filtroNome">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="filtroStatus">
+            <mat-option value="todos">Todos</mat-option>
+            <mat-option value="ativos">Ativos</mat-option>
+            <mat-option value="inativos">Inativos</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Ordenar saldo</mat-label>
+          <mat-select [(ngModel)]="ordenacaoSaldo">
+            <mat-option value="desc">Maior saldo</mat-option>
+            <mat-option value="asc">Menor saldo</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="limparFiltros()" [disabled]="!hasFilters">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpar
+        </button>
+      </div>
+
+      @if (loading && beneficios.length === 0) {
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Carregando beneficios...</span>
+        </div>
+      } @else if (beneficiosFiltrados.length === 0) {
+        <div class="empty">
+          <mat-icon>inventory_2</mat-icon>
+          <strong>Nenhum beneficio encontrado</strong>
+          <span>Ajuste os filtros ou crie um novo beneficio para iniciar a operacao.</span>
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table mat-table [dataSource]="beneficiosFiltrados">
+            <ng-container matColumnDef="nome">
+              <th mat-header-cell *matHeaderCellDef>Nome</th>
+              <td mat-cell *matCellDef="let beneficio">
+                <strong>{{ beneficio.nome }}</strong>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="descricao">
+              <th mat-header-cell *matHeaderCellDef>Descricao</th>
+              <td mat-cell *matCellDef="let beneficio" class="description">{{ beneficio.descricao || '-' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="saldo">
+              <th mat-header-cell *matHeaderCellDef class="align-right">Saldo</th>
+              <td mat-cell *matCellDef="let beneficio" class="money" [class.low]="saldoTone(beneficio) === 'low'" [class.zero]="saldoTone(beneficio) === 'zero'">
+                {{ formatarCentavos(beneficio.valorCentavos) | currency:'BRL' }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ativo">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let beneficio">
+                <span class="status" [class.inactive]="!beneficio.ativo">
+                  {{ beneficio.ativo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="version">
+              <th mat-header-cell *matHeaderCellDef>Versao</th>
+              <td mat-cell *matCellDef="let beneficio">
+                <span class="version">v{{ beneficio.version }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let beneficio" class="row-actions">
+                <button mat-icon-button color="primary" aria-label="Editar" matTooltip="Editar beneficio" (click)="editar(beneficio)" [disabled]="mutating">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" aria-label="Inativar" matTooltip="Inativar beneficio" (click)="inativar(beneficio)" [disabled]="!beneficio.ativo || mutating">
+                  <mat-icon>block</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;" [class.inactive-row]="!row.ativo"></tr>
+          </table>
+        </div>
+      }
+    </section>
+  </section>
+</main>
