@@ -1,0 +1,7 @@
+embed-server --std-out=echo
+
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+
+/subsystem=datasources/data-source=BeneficiosDS:add(jndi-name=java:/jdbc/BeneficiosDS,driver-name=postgresql,connection-url=jdbc:postgresql://${env.DB_HOST:postgres}:${env.DB_PORT:5432}/${env.DB_NAME:beneficios},user-name=${env.DB_USER:beneficios},password=${env.DB_PASSWORD:beneficios},enabled=true,validate-on-match=true,background-validation=false,check-valid-connection-sql="select 1")
+
+stop-embedded-server

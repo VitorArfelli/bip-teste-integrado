@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: beneficios
+      POSTGRES_USER: beneficios
+      POSTGRES_PASSWORD: beneficios
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beneficios -d beneficios"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wildfly:
+    build:
+      context: .
+      dockerfile: beneficio-ejb/Dockerfile
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: beneficios
+      DB_USER: beneficios
+      DB_PASSWORD: beneficios
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /opt/jboss/wildfly/standalone/deployments/beneficio-ejb.jar.deployed ] && /opt/jboss/wildfly/bin/jboss-cli.sh --connect --controller=localhost:9990 ':read-attribute(name=server-state)' | grep -q running"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  beneficio-api:
+    build:
+      context: .
+      dockerfile: beneficio-api/Dockerfile
+    environment:
+      EJB_PROVIDER_URL: http-remoting://wildfly:8080
+      EJB_USERNAME: beneficios
+      EJB_PASSWORD: beneficios123
+    depends_on:
+      wildfly:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  beneficio-web:
+    build:
+      context: .
+      dockerfile: beneficio-web/Dockerfile
+    depends_on:
+      - beneficio-api
+    ports:
+      - "4200:80"
