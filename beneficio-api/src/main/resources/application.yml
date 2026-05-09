@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: beneficio-api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+beneficios:
+  ejb:
+    provider-url: ${EJB_PROVIDER_URL:http-remoting://localhost:8081}
+    jndi-name: ${EJB_JNDI_NAME:ejb:/beneficio-ejb/BeneficioRemoteService!br.com.bip.beneficios.contract.service.BeneficioRemoteService}
+    username: ${EJB_USERNAME:beneficios}
+    password: ${EJB_PASSWORD:beneficios123}
