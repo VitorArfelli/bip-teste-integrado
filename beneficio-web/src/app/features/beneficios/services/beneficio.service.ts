@@ -1,7 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Beneficio, BeneficioRequest, EjbHealth, Transferencia, TransferenciaRequest } from '../models/beneficio.model';
+import {
+  Beneficio,
+  BeneficioCreateRequest,
+  BeneficioUpdateRequest,
+  EjbHealth,
+  Transferencia,
+  TransferenciaRequest
+} from '../models/beneficio.model';
 
 @Injectable({ providedIn: 'root' })
 export class BeneficioService {
@@ -14,11 +21,11 @@ export class BeneficioService {
     return this.http.get<Beneficio[]>(this.baseUrl);
   }
 
-  criar(request: BeneficioRequest): Observable<Beneficio> {
+  criar(request: BeneficioCreateRequest): Observable<Beneficio> {
     return this.http.post<Beneficio>(this.baseUrl, request);
   }
 
-  atualizar(id: number, request: BeneficioRequest): Observable<Beneficio> {
+  atualizar(id: number, request: BeneficioUpdateRequest): Observable<Beneficio> {
     return this.http.put<Beneficio>(`${this.baseUrl}/${id}`, request);
   }
 

@@ -7,10 +7,16 @@ export interface Beneficio {
   version: number;
 }
 
-export interface BeneficioRequest {
+export interface BeneficioCreateRequest {
   nome: string;
   descricao?: string;
   valorCentavos: number;
+  ativo: boolean;
+}
+
+export interface BeneficioUpdateRequest {
+  nome: string;
+  descricao?: string;
   ativo: boolean;
 }
 

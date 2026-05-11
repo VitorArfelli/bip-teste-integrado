@@ -16,7 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmDialogComponent } from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
 import { BeneficioFormDialogComponent } from '../../components/beneficio-form-dialog/beneficio-form-dialog.component';
 import { TransferenciaDialogComponent } from '../../components/transferencia-dialog/transferencia-dialog.component';
-import { ApiError, Beneficio, Transferencia } from '../../models/beneficio.model';
+import { ApiError, Beneficio, BeneficioCreateRequest, BeneficioUpdateRequest, Transferencia } from '../../models/beneficio.model';
 import { BeneficioService } from '../../services/beneficio.service';
 import { centavosParaReais } from '../../utils/money.util';
 
@@ -104,7 +104,7 @@ export class BeneficiosPageComponent implements OnInit {
           return;
         }
         this.mutating = true;
-        this.beneficioService.criar(request).subscribe({
+        this.beneficioService.criar(request as BeneficioCreateRequest).subscribe({
           next: () => this.afterMutation('Beneficio criado.'),
           error: (error) => this.handleError(error)
         });
@@ -119,7 +119,7 @@ export class BeneficiosPageComponent implements OnInit {
           return;
         }
         this.mutating = true;
-        this.beneficioService.atualizar(beneficio.id, request).subscribe({
+        this.beneficioService.atualizar(beneficio.id, request as BeneficioUpdateRequest).subscribe({
           next: () => this.afterMutation('Beneficio atualizado.'),
           error: (error) => this.handleError(error)
         });

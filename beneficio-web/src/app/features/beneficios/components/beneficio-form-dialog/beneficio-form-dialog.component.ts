@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -6,7 +7,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { Beneficio, BeneficioRequest } from '../../models/beneficio.model';
+import { Beneficio, BeneficioCreateRequest, BeneficioUpdateRequest } from '../../models/beneficio.model';
 import { centavosParaInput, reaisParaCentavos } from '../../utils/money.util';
 import { CurrencyMaskDirective } from '../../../../shared/directives/currency-mask.directive';
 
@@ -14,6 +15,7 @@ import { CurrencyMaskDirective } from '../../../../shared/directives/currency-ma
   selector: 'app-beneficio-form-dialog',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -36,13 +38,13 @@ export class BeneficioFormDialogComponent {
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly dialogRef: MatDialogRef<BeneficioFormDialogComponent, BeneficioRequest>,
+    private readonly dialogRef: MatDialogRef<BeneficioFormDialogComponent, BeneficioCreateRequest | BeneficioUpdateRequest>,
     @Inject(MAT_DIALOG_DATA) readonly data: Beneficio | null
   ) {}
 
   salvar(): void {
     const valorCentavos = reaisParaCentavos(this.form.controls.valorReais.value);
-    if (!Number.isSafeInteger(valorCentavos) || valorCentavos < 0) {
+    if (!this.data && (!Number.isSafeInteger(valorCentavos) || valorCentavos < 0)) {
       this.form.controls.valorReais.setErrors({ valorInvalido: true });
     }
     if (this.form.invalid) {
@@ -50,6 +52,14 @@ export class BeneficioFormDialogComponent {
       return;
     }
     const formValue = this.form.getRawValue();
+    if (this.data) {
+      this.dialogRef.close({
+        nome: formValue.nome,
+        descricao: formValue.descricao,
+        ativo: formValue.ativo
+      });
+      return;
+    }
     this.dialogRef.close({
       nome: formValue.nome,
       descricao: formValue.descricao,

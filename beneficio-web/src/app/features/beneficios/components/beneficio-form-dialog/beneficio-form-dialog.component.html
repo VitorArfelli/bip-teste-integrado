@@ -13,7 +13,7 @@
       <textarea matInput formControlName="descricao" rows="3" maxlength="255"></textarea>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" floatLabel="always">
+    <mat-form-field *ngIf="!data" appearance="outline" floatLabel="always">
       <mat-label>Valor</mat-label>
       <span matTextPrefix>R$&nbsp;</span>
       <input matInput type="text" inputmode="decimal" formControlName="valorReais" placeholder="0,00" appCurrencyMask>
