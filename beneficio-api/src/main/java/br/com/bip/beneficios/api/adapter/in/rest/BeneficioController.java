@@ -74,7 +74,7 @@ public class BeneficioController {
 	}
 
 	@PutMapping("/{id}")
-	@Operation(summary = "Atualiza benefício", description = "Atualiza dados cadastrais, status e saldo do benefício.")
+	@Operation(summary = "Atualiza benefício", description = "Atualiza dados cadastrais e status do benefício sem alterar saldo.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Benefício atualizado com sucesso.", content = @Content(schema = @Schema(implementation = BeneficioResponse.class))),
 			@ApiResponse(responseCode = "400", description = "Payload inválido ou regra de negócio violada.", content = @Content(schema = @Schema(implementation = ApiError.class))),

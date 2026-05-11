@@ -65,6 +65,19 @@ public class Beneficio {
 	}
 
 	/**
+	 * Atualiza dados cadastrais sem alterar o saldo.
+	 *
+	 * @param nome      nome do benefício.
+	 * @param descricao descrição complementar.
+	 * @param ativo     indica se o benefício está ativo para operações.
+	 */
+	public void atualizarDados(String nome, String descricao, boolean ativo) {
+		this.nome = nome;
+		this.descricao = descricao;
+		this.ativo = ativo;
+	}
+
+	/**
 	 * Debita saldo do benefício.
 	 *
 	 * @param valorCentavosTransferencia valor debitado em centavos.

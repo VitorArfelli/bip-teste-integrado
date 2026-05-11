@@ -3,6 +3,7 @@ package br.com.bip.beneficios.api.application;
 import br.com.bip.beneficios.api.application.port.BeneficioRemoteClient;
 import br.com.bip.beneficios.contract.dto.BeneficioDto;
 import br.com.bip.beneficios.contract.dto.BeneficioRequestDto;
+import br.com.bip.beneficios.contract.dto.BeneficioUpdateRequestDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaRequestDto;
 import br.com.bip.beneficios.contract.service.BeneficioRemoteService;
@@ -72,7 +73,7 @@ class BeneficioServiceTest {
         }
 
         @Override
-        public BeneficioDto atualizar(Long id, BeneficioRequestDto request) {
+        public BeneficioDto atualizar(Long id, BeneficioUpdateRequestDto request) {
             return null;
         }
 

@@ -2,10 +2,12 @@ package br.com.bip.beneficios.api.adapter.in.rest.mapper;
 
 import br.com.bip.beneficios.api.adapter.in.rest.dto.BeneficioCreateRequest;
 import br.com.bip.beneficios.api.adapter.in.rest.dto.BeneficioResponse;
+import br.com.bip.beneficios.api.adapter.in.rest.dto.BeneficioUpdateRequest;
 import br.com.bip.beneficios.api.adapter.in.rest.dto.TransferenciaRequest;
 import br.com.bip.beneficios.api.adapter.in.rest.dto.TransferenciaResponse;
 import br.com.bip.beneficios.contract.dto.BeneficioDto;
 import br.com.bip.beneficios.contract.dto.BeneficioRequestDto;
+import br.com.bip.beneficios.contract.dto.BeneficioUpdateRequestDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaRequestDto;
 
@@ -16,6 +18,10 @@ public final class BeneficioRestMapper {
 	public static BeneficioRequestDto toContract(BeneficioCreateRequest request) {
 		return new BeneficioRequestDto(request.getNome(), request.getDescricao(), request.getValorCentavos(),
 				request.getAtivo());
+	}
+
+	public static BeneficioUpdateRequestDto toContract(BeneficioUpdateRequest request) {
+		return new BeneficioUpdateRequestDto(request.getNome(), request.getDescricao(), request.getAtivo());
 	}
 
 	public static TransferenciaRequestDto toContract(TransferenciaRequest request) {

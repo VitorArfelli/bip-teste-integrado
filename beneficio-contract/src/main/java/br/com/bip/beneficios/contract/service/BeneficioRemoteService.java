@@ -2,6 +2,7 @@ package br.com.bip.beneficios.contract.service;
 
 import br.com.bip.beneficios.contract.dto.BeneficioDto;
 import br.com.bip.beneficios.contract.dto.BeneficioRequestDto;
+import br.com.bip.beneficios.contract.dto.BeneficioUpdateRequestDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaDto;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public interface BeneficioRemoteService {
 	 * @param request dados de atualização.
 	 * @return benefício atualizado.
 	 */
-	BeneficioDto atualizar(Long id, BeneficioRequestDto request);
+	BeneficioDto atualizar(Long id, BeneficioUpdateRequestDto request);
 
 	/**
 	 * Inativa um benefício existente.

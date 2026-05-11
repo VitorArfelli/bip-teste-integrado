@@ -2,6 +2,7 @@ package br.com.bip.beneficios.ejb.service;
 
 import br.com.bip.beneficios.contract.dto.BeneficioDto;
 import br.com.bip.beneficios.contract.dto.BeneficioRequestDto;
+import br.com.bip.beneficios.contract.dto.BeneficioUpdateRequestDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaDto;
 import br.com.bip.beneficios.contract.exception.BeneficioNotFoundException;
 import br.com.bip.beneficios.contract.service.BeneficioRemoteService;
@@ -82,10 +83,10 @@ public class BeneficioEjbService implements BeneficioRemoteService {
 	 * @return benefício atualizado.
 	 */
 	@Override
-	public BeneficioDto atualizar(Long id, BeneficioRequestDto request) {
-		BeneficioValidator.validarBeneficio(request);
+	public BeneficioDto atualizar(Long id, BeneficioUpdateRequestDto request) {
+		BeneficioValidator.validarAtualizacaoBeneficio(request);
 		Beneficio beneficio = buscarBeneficio(id);
-		beneficio.atualizar(request.getNome().trim(), request.getDescricao(), request.getValorCentavos(),
+		beneficio.atualizarDados(request.getNome().trim(), request.getDescricao(),
 				request.getAtivo() == null || request.getAtivo());
 		return BeneficioMapper.toDto(beneficio);
 	}

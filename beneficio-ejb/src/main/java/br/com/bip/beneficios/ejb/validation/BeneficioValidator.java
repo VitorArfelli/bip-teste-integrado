@@ -1,6 +1,7 @@
 package br.com.bip.beneficios.ejb.validation;
 
 import br.com.bip.beneficios.contract.dto.BeneficioRequestDto;
+import br.com.bip.beneficios.contract.dto.BeneficioUpdateRequestDto;
 import br.com.bip.beneficios.contract.exception.InactiveBeneficioException;
 import br.com.bip.beneficios.contract.exception.InsufficientBalanceException;
 import br.com.bip.beneficios.contract.exception.InvalidBeneficioException;
@@ -37,6 +38,26 @@ public final class BeneficioValidator {
 		}
 		if (request.getValorCentavos() < 0) {
 			throw new InvalidBeneficioException("Valor do beneficio nao pode ser negativo.");
+		}
+	}
+
+	/**
+	 * Valida os dados cadastrais de atualização sem permitir alteração direta de saldo.
+	 *
+	 * @param request dados recebidos pelo contrato remoto.
+	 */
+	public static void validarAtualizacaoBeneficio(BeneficioUpdateRequestDto request) {
+		if (request == null) {
+			throw new InvalidBeneficioException("Dados do beneficio sao obrigatorios.");
+		}
+		if (request.getNome() == null || request.getNome().trim().isEmpty()) {
+			throw new InvalidBeneficioException("Nome do beneficio e obrigatorio.");
+		}
+		if (request.getNome().length() > 100) {
+			throw new InvalidBeneficioException("Nome do beneficio deve ter no maximo 100 caracteres.");
+		}
+		if (request.getDescricao() != null && request.getDescricao().length() > 255) {
+			throw new InvalidBeneficioException("Descricao do beneficio deve ter no maximo 255 caracteres.");
 		}
 	}
 

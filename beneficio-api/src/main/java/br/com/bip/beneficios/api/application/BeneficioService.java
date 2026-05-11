@@ -3,6 +3,7 @@ package br.com.bip.beneficios.api.application;
 import br.com.bip.beneficios.api.application.port.BeneficioRemoteClient;
 import br.com.bip.beneficios.contract.dto.BeneficioDto;
 import br.com.bip.beneficios.contract.dto.BeneficioRequestDto;
+import br.com.bip.beneficios.contract.dto.BeneficioUpdateRequestDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaRequestDto;
 import java.util.List;
@@ -68,7 +69,7 @@ public class BeneficioService {
 	 * @param request dados de atualização.
 	 * @return benefício atualizado.
 	 */
-	public BeneficioDto atualizar(Long id, BeneficioRequestDto request) {
+	public BeneficioDto atualizar(Long id, BeneficioUpdateRequestDto request) {
 		return remoteClient.service().atualizar(id, request);
 	}
 

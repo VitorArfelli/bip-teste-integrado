@@ -5,6 +5,7 @@ import br.com.bip.beneficios.api.application.BeneficioService;
 import br.com.bip.beneficios.api.config.CorrelationIdFilter;
 import br.com.bip.beneficios.contract.dto.BeneficioDto;
 import br.com.bip.beneficios.contract.dto.BeneficioRequestDto;
+import br.com.bip.beneficios.contract.dto.BeneficioUpdateRequestDto;
 import br.com.bip.beneficios.contract.dto.TransferenciaDto;
 import br.com.bip.beneficios.contract.exception.BeneficioNotFoundException;
 import br.com.bip.beneficios.contract.exception.InsufficientBalanceException;
@@ -27,6 +28,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -107,6 +109,19 @@ class BeneficioControllerTest {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("INVALID_PARAMETER"))
 				.andExpect(jsonPath("$.status").value(400));
+	}
+
+	@Test
+	void atualizaBeneficioSemAlterarSaldo() throws Exception {
+		BeneficioUpdateRequest request = new BeneficioUpdateRequest("Beneficio Editado", "Descricao editada", true);
+
+		mockMvc.perform(put("/api/v1/beneficios/1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.nome").value("Beneficio Editado"))
+				.andExpect(jsonPath("$.valorCentavos").value(100000));
 	}
 
 	@Test
@@ -195,6 +210,9 @@ class BeneficioControllerTest {
 	private record BeneficioRequest(String nome, String descricao, Long valorCentavos, Boolean ativo) {
 	}
 
+	private record BeneficioUpdateRequest(String nome, String descricao, Boolean ativo) {
+	}
+
 	private record TransferenciaRequest(Long origemId, Long destinoId, Long valorCentavos) {
 	}
 
@@ -228,9 +246,9 @@ class BeneficioControllerTest {
 		}
 
 		@Override
-		public BeneficioDto atualizar(Long id, BeneficioRequestDto request) {
+		public BeneficioDto atualizar(Long id, BeneficioUpdateRequestDto request) {
 			failIfConfigured();
-			return new BeneficioDto(id, request.getNome(), request.getDescricao(), request.getValorCentavos(),
+			return new BeneficioDto(id, request.getNome(), request.getDescricao(), 100000L,
 					request.getAtivo() == null || request.getAtivo(), 1L);
 		}
 
