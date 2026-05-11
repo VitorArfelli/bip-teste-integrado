@@ -2,7 +2,7 @@
 
 <mat-dialog-content>
   <div class="confirm-message" [class.danger]="data.tone === 'danger'">
-    <mat-icon>{{ data.tone === 'danger' ? 'warning' : 'help' }}</mat-icon>
+    <mat-icon [svgIcon]="data.tone === 'danger' ? 'warning' : 'help'"></mat-icon>
     <p>{{ data.message }}</p>
   </div>
 </mat-dialog-content>

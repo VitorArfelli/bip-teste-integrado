@@ -9,7 +9,7 @@
     </div>
 
     <nav class="nav" aria-label="Navegacao principal">
-      <a class="active"><mat-icon>dashboard</mat-icon> Operacao</a>
+      <a class="active"><mat-icon svgIcon="dashboard"></mat-icon> Operacao</a>
     </nav>
   </aside>
 
@@ -21,15 +21,15 @@
       </div>
       <div class="actions">
         <button mat-stroked-button color="primary" (click)="carregar()" [disabled]="loading || mutating" matTooltip="Atualizar dados">
-          <mat-icon>refresh</mat-icon>
+          <mat-icon svgIcon="refresh"></mat-icon>
           Atualizar
         </button>
         <button mat-stroked-button color="primary" (click)="abrirTransferencia()" [disabled]="beneficiosAtivos < 2 || mutating">
-          <mat-icon>sync_alt</mat-icon>
+          <mat-icon svgIcon="sync_alt"></mat-icon>
           Transferir
         </button>
         <button mat-flat-button color="primary" (click)="novo()" [disabled]="mutating">
-          <mat-icon>add</mat-icon>
+          <mat-icon svgIcon="add"></mat-icon>
           Novo beneficio
         </button>
       </div>
@@ -82,7 +82,7 @@
       <div class="filters">
         <mat-form-field appearance="outline">
           <mat-label>Buscar por nome</mat-label>
-          <mat-icon matPrefix>search</mat-icon>
+          <mat-icon matPrefix svgIcon="search"></mat-icon>
           <input matInput [(ngModel)]="filtroNome">
         </mat-form-field>
 
@@ -104,7 +104,7 @@
         </mat-form-field>
 
         <button mat-stroked-button (click)="limparFiltros()" [disabled]="!hasFilters">
-          <mat-icon>filter_alt_off</mat-icon>
+          <mat-icon svgIcon="filter_alt_off"></mat-icon>
           Limpar
         </button>
       </div>
@@ -116,7 +116,7 @@
         </div>
       } @else if (beneficiosFiltrados.length === 0) {
         <div class="empty">
-          <mat-icon>inventory_2</mat-icon>
+          <mat-icon svgIcon="inventory_2"></mat-icon>
           <strong>Nenhum beneficio encontrado</strong>
           <span>Ajuste os filtros ou crie um novo beneficio para iniciar a operacao.</span>
         </div>
@@ -162,10 +162,10 @@
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let beneficio" class="row-actions">
                 <button mat-icon-button color="primary" aria-label="Editar" matTooltip="Editar beneficio" (click)="editar(beneficio)" [disabled]="mutating">
-                  <mat-icon>edit</mat-icon>
+                  <mat-icon svgIcon="edit"></mat-icon>
                 </button>
                 <button mat-icon-button color="warn" aria-label="Inativar" matTooltip="Inativar beneficio" (click)="inativar(beneficio)" [disabled]="!beneficio.ativo || mutating">
-                  <mat-icon>block</mat-icon>
+                  <mat-icon svgIcon="block"></mat-icon>
                 </button>
               </td>
             </ng-container>
