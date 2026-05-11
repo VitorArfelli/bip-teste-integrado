@@ -5,6 +5,7 @@ coverage/
 .angular/
 .cache/
 .classpath
+.factorypath
 .project
 .settings/
 *.log
