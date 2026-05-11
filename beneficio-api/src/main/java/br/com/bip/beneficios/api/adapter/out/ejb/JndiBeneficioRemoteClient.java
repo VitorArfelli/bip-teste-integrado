@@ -1,8 +1,11 @@
 package br.com.bip.beneficios.api.adapter.out.ejb;
 
 import br.com.bip.beneficios.api.application.port.BeneficioRemoteClient;
+import br.com.bip.beneficios.contract.exception.BeneficioContractException;
 import br.com.bip.beneficios.contract.service.BeneficioRemoteService;
 import java.util.Properties;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -41,6 +44,25 @@ public class JndiBeneficioRemoteClient implements BeneficioRemoteClient {
 		return currentService;
 	}
 
+	@Override
+	public <T> T call(Function<BeneficioRemoteService, T> operation) {
+		try {
+			return operation.apply(service());
+		} catch (RuntimeException exception) {
+			handleRemoteFailure(exception);
+			throw exception;
+		}
+	}
+
+	@Override
+	public void run(Consumer<BeneficioRemoteService> operation) {
+		try {
+			operation.accept(service());
+		} catch (RuntimeException exception) {
+			handleRemoteFailure(exception);
+		}
+	}
+
 	private BeneficioRemoteService lookup() {
 		Properties properties = new Properties();
 		properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
@@ -53,5 +75,24 @@ public class JndiBeneficioRemoteClient implements BeneficioRemoteClient {
 		} catch (NamingException exception) {
 			throw new EjbIntegrationException("Nao foi possivel localizar o EJB remoto.", exception);
 		}
+	}
+
+	private void handleRemoteFailure(RuntimeException exception) {
+		if (exception instanceof EjbIntegrationException || findContractException(exception) != null) {
+			throw exception;
+		}
+		service = null;
+		throw new EjbIntegrationException("Falha de comunicacao com o EJB remoto.", exception);
+	}
+
+	private BeneficioContractException findContractException(Throwable exception) {
+		Throwable current = exception;
+		while (current != null) {
+			if (current instanceof BeneficioContractException contractException) {
+				return contractException;
+			}
+			current = current.getCause();
+		}
+		return null;
 	}
 }

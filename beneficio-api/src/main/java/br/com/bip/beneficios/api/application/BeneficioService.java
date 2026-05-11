@@ -30,7 +30,7 @@ public class BeneficioService {
 	 * @return resposta de disponibilidade do EJB.
 	 */
 	public String pingEjb() {
-		return remoteClient.service().ping();
+		return remoteClient.call(service -> service.ping());
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class BeneficioService {
 	 * @return benefícios cadastrados.
 	 */
 	public List<BeneficioDto> listar() {
-		return remoteClient.service().listar();
+		return remoteClient.call(service -> service.listar());
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class BeneficioService {
 	 * @return benefício encontrado.
 	 */
 	public BeneficioDto buscarPorId(Long id) {
-		return remoteClient.service().buscarPorId(id);
+		return remoteClient.call(service -> service.buscarPorId(id));
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class BeneficioService {
 	 * @return benefício criado.
 	 */
 	public BeneficioDto criar(BeneficioRequestDto request) {
-		return remoteClient.service().criar(request);
+		return remoteClient.call(service -> service.criar(request));
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class BeneficioService {
 	 * @return benefício atualizado.
 	 */
 	public BeneficioDto atualizar(Long id, BeneficioUpdateRequestDto request) {
-		return remoteClient.service().atualizar(id, request);
+		return remoteClient.call(service -> service.atualizar(id, request));
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class BeneficioService {
 	 * @param id identificador do benefício.
 	 */
 	public void inativar(Long id) {
-		remoteClient.service().inativar(id);
+		remoteClient.run(service -> service.inativar(id));
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class BeneficioService {
 	 * @return transferências recentes.
 	 */
 	public List<TransferenciaDto> listarTransferencias() {
-		return remoteClient.service().listarTransferencias();
+		return remoteClient.call(service -> service.listarTransferencias());
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class BeneficioService {
 	 * @return transferência registrada.
 	 */
 	public TransferenciaDto transferir(TransferenciaRequestDto request) {
-		return remoteClient.service().transferir(request.getOrigemId(), request.getDestinoId(),
-				request.getValorCentavos());
+		return remoteClient.call(service -> service.transferir(request.getOrigemId(), request.getDestinoId(),
+				request.getValorCentavos()));
 	}
 }
