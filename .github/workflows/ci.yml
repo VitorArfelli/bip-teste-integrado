@@ -36,3 +36,23 @@ jobs:
       - name: Build
         working-directory: beneficio-web
         run: npm run build
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Start stack
+        run: docker compose up --build -d
+      - name: Smoke test
+        run: bash scripts/smoke-test.sh
+      - name: Concurrency test
+        run: bash scripts/concurrency-test.sh
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs --tail=200
+      - name: Stop stack
+        if: always()
+        run: docker compose down -v

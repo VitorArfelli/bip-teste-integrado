@@ -38,13 +38,30 @@ json_pretty() {
   node -e "console.log(JSON.stringify(JSON.parse(process.argv[1]), null, 2));" "$1"
 }
 
+wait_for_api() {
+  for _ in $(seq 1 60); do
+    if curl --max-time 2 -fsS "$API_URL/actuator/health" >/dev/null 2>&1; then
+      return
+    fi
+    sleep 2
+  done
+  echo "ERROR: API did not become healthy at $API_URL." >&2
+  exit 1
+}
+
+http_status() {
+  sed -n 's/^HTTP //p' "$1" | tail -n 1
+}
+
+wait_for_api
+
 origin_payload="{\"nome\":\"Concorrencia Origem $suffix\",\"descricao\":\"Conta criada pelo teste de concorrencia\",\"valorCentavos\":100000,\"ativo\":true}"
 target_payload="{\"nome\":\"Concorrencia Destino $suffix\",\"descricao\":\"Conta criada pelo teste de concorrencia\",\"valorCentavos\":0,\"ativo\":true}"
 
-origin=$(curl -sS -X POST "$API_URL/api/v1/beneficios" \
+origin=$(curl --max-time 20 -sS -X POST "$API_URL/api/v1/beneficios" \
   -H 'Content-Type: application/json' \
   -d "$origin_payload")
-target=$(curl -sS -X POST "$API_URL/api/v1/beneficios" \
+target=$(curl --max-time 20 -sS -X POST "$API_URL/api/v1/beneficios" \
   -H 'Content-Type: application/json' \
   -d "$target_payload")
 
@@ -56,12 +73,12 @@ transfer_payload="{\"origemId\":$origin_id,\"destinoId\":$target_id,\"valorCenta
 tmp_one=$(mktemp)
 tmp_two=$(mktemp)
 
-curl -sS -w '\nHTTP %{http_code}\n' -X POST "$API_URL/api/v1/beneficios/transferencias" \
+curl --max-time 20 -sS -w '\nHTTP %{http_code}\n' -X POST "$API_URL/api/v1/beneficios/transferencias" \
   -H 'Content-Type: application/json' \
   -d "$transfer_payload" > "$tmp_one" &
 pid_one=$!
 
-curl -sS -w '\nHTTP %{http_code}\n' -X POST "$API_URL/api/v1/beneficios/transferencias" \
+curl --max-time 20 -sS -w '\nHTTP %{http_code}\n' -X POST "$API_URL/api/v1/beneficios/transferencias" \
   -H 'Content-Type: application/json' \
   -d "$transfer_payload" > "$tmp_two" &
 pid_two=$!
@@ -69,7 +86,7 @@ pid_two=$!
 wait "$pid_one" || true
 wait "$pid_two" || true
 
-beneficios=$(curl -sS "$API_URL/api/v1/beneficios")
+beneficios=$(curl --max-time 20 -sS "$API_URL/api/v1/beneficios")
 origin_after=$(json_select_id "$beneficios" "$origin_id")
 target_after=$(json_select_id "$beneficios" "$target_id")
 
@@ -89,11 +106,37 @@ echo "Target after:"
 json_pretty "$target_after"
 
 origin_balance=$(json_get "$origin_after" valorCentavos)
-if [ "$origin_balance" -ge 0 ]; then
+target_balance=$(json_get "$target_after" valorCentavos)
+status_one=$(http_status "$tmp_one")
+status_two=$(http_status "$tmp_two")
+success_count=0
+business_failure_count=0
+
+for status in "$status_one" "$status_two"; do
+  if [ "$status" = "201" ]; then
+    success_count=$((success_count + 1))
+  elif [ "$status" = "400" ]; then
+    business_failure_count=$((business_failure_count + 1))
+  fi
+done
+
+if [ "$success_count" -ne 1 ] || [ "$business_failure_count" -ne 1 ]; then
   echo
-  echo "OK: origin balance is not negative."
-else
+  echo "ERROR: expected exactly one 201 response and one 400 response. Got $status_one and $status_two." >&2
+  exit 1
+fi
+
+if [ "$origin_balance" -lt 0 ]; then
   echo
   echo "ERROR: origin balance is negative." >&2
   exit 1
 fi
+
+if [ "$origin_balance" -ne 20000 ] || [ "$target_balance" -ne 80000 ]; then
+  echo
+  echo "ERROR: unexpected balances. Expected origin=20000 and target=80000, got origin=$origin_balance and target=$target_balance." >&2
+  exit 1
+fi
+
+echo
+echo "OK: exactly one transfer succeeded, one failed by business rule, and balances are consistent."

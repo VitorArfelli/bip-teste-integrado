@@ -143,6 +143,14 @@ API_URL=http://localhost:8080 bash scripts/concurrency-test.sh
 
 Esse script cria dois benefícios temporários e dispara duas transferências simultâneas sobre o mesmo saldo. O resultado esperado é que apenas uma transferência seja concluída ou que uma delas falhe por regra de negócio, sem deixar saldo negativo.
 
+Smoke test integrado, com a aplicação rodando:
+
+```bash
+API_URL=http://localhost:8080 bash scripts/smoke-test.sh
+```
+
+Esse script cria dois benefícios, executa uma transferência, confere os saldos finais e valida se a transferência aparece na listagem de auditoria.
+
 ## API
 
 Principais endpoints:
@@ -171,3 +179,4 @@ O GitHub Actions executa:
 
 - build e testes Maven dos módulos Java;
 - instalação, testes headless e build do Angular.
+- smoke test integrado e teste de concorrência contra a stack Docker Compose.
