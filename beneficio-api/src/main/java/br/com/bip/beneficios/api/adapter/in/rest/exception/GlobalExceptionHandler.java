@@ -8,11 +8,16 @@ import br.com.bip.beneficios.contract.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +36,31 @@ public class GlobalExceptionHandler {
 		List<String> messages = exception.getBindingResult().getFieldErrors().stream()
 				.map(error -> error.getField() + ": " + error.getDefaultMessage()).toList();
 		return build(HttpStatus.BAD_REQUEST, "REQUEST_VALIDATION_ERROR", messages, request);
+	}
+
+	@ExceptionHandler(BindException.class)
+	ResponseEntity<ApiError> handleBind(BindException exception, HttpServletRequest request) {
+		List<String> messages = exception.getBindingResult().getFieldErrors().stream()
+				.map(error -> error.getField() + ": " + error.getDefaultMessage()).toList();
+		return build(HttpStatus.BAD_REQUEST, "REQUEST_VALIDATION_ERROR", messages, request);
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	ResponseEntity<ApiError> handleUnreadable(HttpMessageNotReadableException exception, HttpServletRequest request) {
+		return build(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST", List.of("Payload JSON invalido ou ausente."),
+				request);
+	}
+
+	@ExceptionHandler({ MethodArgumentTypeMismatchException.class, TypeMismatchException.class })
+	ResponseEntity<ApiError> handleTypeMismatch(TypeMismatchException exception, HttpServletRequest request) {
+		return build(HttpStatus.BAD_REQUEST, "INVALID_PARAMETER", List.of("Parametro com tipo invalido."), request);
+	}
+
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	ResponseEntity<ApiError> handleMissingParameter(MissingServletRequestParameterException exception,
+			HttpServletRequest request) {
+		return build(HttpStatus.BAD_REQUEST, "INVALID_PARAMETER",
+				List.of("Parametro obrigatorio ausente: " + exception.getParameterName() + "."), request);
 	}
 
 	@ExceptionHandler(EjbIntegrationException.class)

@@ -92,6 +92,24 @@ class BeneficioControllerTest {
 	}
 
 	@Test
+	void retornaBadRequestParaJsonMalformado() throws Exception {
+		mockMvc.perform(post("/api/v1/beneficios")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"nome\":"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("MALFORMED_REQUEST"))
+				.andExpect(jsonPath("$.status").value(400));
+	}
+
+	@Test
+	void retornaBadRequestParaPathVariableInvalida() throws Exception {
+		mockMvc.perform(get("/api/v1/beneficios/abc"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("INVALID_PARAMETER"))
+				.andExpect(jsonPath("$.status").value(400));
+	}
+
+	@Test
 	void retornaNotFoundQuandoBeneficioNaoExiste() throws Exception {
 		remoteService.exception = new BeneficioNotFoundException(99L);
 
